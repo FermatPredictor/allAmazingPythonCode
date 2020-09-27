@@ -1,8 +1,11 @@
 from functools import reduce
 import numpy as np
-import math
 from sklearn.model_selection import train_test_split
 from itertools import combinations_with_replacement as CWR
+
+import sys
+sys.path.append('..') # 添加相對路徑上層到sys.path，讓程式找到的模組_package
+from _package._data_analysis.data_analysis import RMS, normalization
 
 """
  計算一個陣列透過idx的指定乘積
@@ -39,16 +42,13 @@ def designPolyFunc(x_dim, polyDeg=1):
  1 f1(xm) f2(xm) ... fk(xm)
 """
 def preprocess(funcs, X):
+    X = normalization(X)
     mat = [[f(x) for f in funcs] for x in X]
     return np.array(mat)
 
 # 公式解B= [(X_TX)^-1+ lamb\*I(單位矩陣)]X_TY
 def parameter(X, Y, lamb=0):
     return np.dot(np.linalg.inv(np.dot(X.T,X)+lamb*np.eye(X.shape[1])),np.dot(X.T,Y))
-
-# 計算預測的Y和真實Y之間的root mean square
-def RMS(perdict_Y, real_Y):
-    return math.sqrt(sum((real_Y-perdict_Y)**2)*2/len(real_Y))
 
 
 # 把訓練資料、測試資料(預處理過的data)、lamb(若用MAP方法才要傳lamb)，做一次訓練
@@ -65,8 +65,6 @@ def training(x_train,x_test, y_train, y_test, lamb=0):
     test_error= RMS(perdict_Y,y_test)
     return beta, train_error, test_error
 
-def normalization(arr):
-    return np.apply_along_axis(lambda x: (x-min(x)) / (max(x)-min(x)), axis=0, arr=arr)
     
 if __name__ == '__main__':
     np.random.seed(931) # 這邊設固定的random seed，確保練習用的資料相同
@@ -75,7 +73,6 @@ if __name__ == '__main__':
     
     # 資料預處理
     funcs = designPolyFunc(3, polyDeg=2)
-    X = normalization(X)
     X_pro = preprocess(funcs, X)
     
     # 資料切割成訓練集、測試集
