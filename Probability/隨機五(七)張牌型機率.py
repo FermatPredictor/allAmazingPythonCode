@@ -1,9 +1,5 @@
-"""
-程式功能:
-可以在任意不重複的5~7張牌中找出最大的牌型，
-並能夠判斷兩副牌的大小。
-"""
 import random
+import time
 from collections import Counter
 from itertools import groupby
 
@@ -27,10 +23,11 @@ def strToCard(cardStr):
 class Deck():  
     def shuffule(self, time=1):
         random.shuffle(self.cards)
-        print("Deck shuffled")
+        #print("Deck shuffled")
         
     def deal(self):
         return self.cards.pop(0)
+    
     
     #放幾張特定的牌進牌堆，字串格式如 "5d 5s 9c 9d 9h"
     def put(self, cardStr):
@@ -146,31 +143,44 @@ def pokerSort(hands):
 
     
 if __name__=='__main__':
+    """
+    程式功能: 用程試測試隨機五張牌的牌型概率，與數學算出來的理論值比較
+    各牌型的出現概率如下:
     
-    deck=StardardDeck()
-    deck.shuffule()
+    straight flush    0.0014%
+    four of a kind    0.0240%
+    full house        0.1441%
+    flush             0.1965%
+    straight          0.3925%
+    three of a kind   2.1128%
+    two pair          4.7539%
+    one pair          42.2569%
+    high card         50.1177%
+    
+    五~七張牌的機率: https://home.gamer.com.tw/creationDetail.php?sn=3828045
+    
+    實測一百萬次隨機取五張牌，大致與理論值接近:
+    Total time= 34.431500 seconds
+    #由高牌到同花順的出現次數
+    [501392, 421984, 47823, 21211, 3953, 1994, 1406, 222, 15]
+    
+    [TODO] 目前隨機生成五張牌太花時間，需調整
+    """
+    List=[0]*9
+    tStart = time.time()#計時開始
+    deck = StardardDeck()
+    deck.shuffule() #洗牌
+    Tom=Player()
     for card in deck.cards:
         card.showing=True
-    Tom=Player()
-    
-    # 隨機抽7張牌測試牌型
-    for i in range(7):
-        Tom.addCard(deck)
-    print(Tom.cards)
-    print(groupby_suit(Tom.strRepr()))
-    print(hand_rank(Tom.strRepr()))
-
-    sf="2c 3c 3d 4d 4c 5c Ac"
-    fk="Tc Td Th Ts 7c 7d 2c"
-    fh="Tc Td Th 7c 7d 7s"
-    f= "2d 5d 7d 9d Ad"
-    s1="As 2s 3s 4s 5c"
-    s2="2c 3c 4c 5c 6d"
-    tk="3c 3d 3s 5d Ac"
-    tp="5c 5d 9c 9d 6h"
-    ah="As 2s 3s 4h 6d"
-    sh="2d 3h 4h 6s 7d"
-    hands=[sf,fk,fh,f,s1,s2,tk,tp,ah,sh]
-    print(pokerSort(hands))
-    for hand in hands:
-        print(hand, hand_rank(hand))
+    for _ in range(10000):
+        deck.shuffule() #洗牌
+        for _ in range(5):
+            Tom.addCard(deck)
+        cardType=hand_rank(Tom.strRepr())[0]
+        List[cardType-1]+=1
+        deck.put(Tom.strRepr()) #把牌放回牌堆
+        Tom.cards.clear() #清空手牌
+    tEnd = time.time()#計時結束
+    print("Total time= %f seconds" % (tEnd - tStart))
+    print(List)
