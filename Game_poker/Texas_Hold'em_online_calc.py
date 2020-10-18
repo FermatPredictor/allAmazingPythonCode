@@ -108,17 +108,6 @@ def myCardWin(myCard, field, rivalCardList, debug=False):
         print(f'rivalCard are: {rivalCardList}')
         print(f'rank of cards: {ranks}')
     return ranks[0]
-    
-    """ 查看哪些牌可以贏過自己 """
-    BIG_CARD = max(Hands,key=hand_rank)
-    if myHand != BIG_CARD:
-        print('--------------------')
-        print(myHand, hand_rank(myHand))
-        for r in rivalCardList:
-            if hand_rank(r+field)> hand_rank(myHand):
-                print(field, r, hand_rank(r+field))
-            
-    return myHand == BIG_CARD
 
 
 def winProb(myCard, fieldCard=None, simulate=1000, rivalNum=1):  
