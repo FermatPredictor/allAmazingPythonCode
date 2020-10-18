@@ -16,6 +16,7 @@ class Deck():
     #抽一張牌，默認抽牌堆最上方的牌，或指定抽特定牌
     def draw(self, card=None):
         if card:
+            card = card[0].upper()+card[1]
             self.cards.remove(card)
             return card
         return self.cards.pop(0)

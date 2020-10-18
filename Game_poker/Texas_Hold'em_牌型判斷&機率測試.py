@@ -44,7 +44,7 @@ def groupby_suit(cards):
 
 def hand_rank(hand):
     """
-    hand 的格式為字串如 "5d 5s 9c 9d 9h" 來表示一手牌
+    hand 的格式為列表如 ["5d", "5s", "9c", "9d", "9h"] 來表示一手牌
     判斷手牌屬於何種牌型
     """
     rank = card_rank(hand)
