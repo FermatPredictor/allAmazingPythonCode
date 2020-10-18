@@ -13,10 +13,10 @@ from _package._poker.poker_tool import Deck, StardardDeck
 
 # 順子(注意A需要看作是1而非14)
 def straight(rank):
-    rank = sorted(set([1 if x==14 else x for x in rank]))
+    rank = sorted(set([1 if x==14 else x for x in rank]), reverse=True)
     for i in range(len(rank)-4):
-        if rank[i+4]-rank[i]==4:
-            return rank[i+4]
+        if rank[i]-rank[i+4]==4:
+            return rank[i]
     return False
     
 #回傳數字陣列恰好出現n次的數字，降序排列
@@ -52,7 +52,7 @@ def hand_rank(hand):
     
     flush = sorted(filter(lambda v: len(v)>=5, suit_gp.values()), reverse=True)
     _straight = straight(rank)
-    straightFlush = sorted(filter(lambda v: len(v)>=5 and straight(v), suit_gp.values()), reverse=True)
+    straightFlush = sorted(filter(lambda v: straight(v), flush), reverse=True)
     
     single, pair, three_kind, four_kind = (n_kind(rank, i) for i in range(1,5))
     
@@ -76,9 +76,6 @@ def hand_rank(hand):
         return (2, pair[0],*single[:3])
     return (1,*single[:5])
 
-#將一堆手牌按照牌型大小排序    
-def pokerSort(hands):
-    return sorted(hands,key=hand_rank,reverse=True)
                 
 if __name__=='__main__':
     
@@ -90,14 +87,13 @@ if __name__=='__main__':
     fk="Tc Td Th Ts 7c 7d 2c"
     fh="Tc Td Th 7c 7d 7s"
     f= "2d 5d 7d 9d Ad"
-    s1="As 2s 3s 4s 5c"
+    s1="As 2s 3s 4s 5c 6d"
     s2="2c 3c 4c 5c 6d"
     tk="3c 3d 3s 5d Ac"
     tp="5c 5d 9c 9d 6h"
     ah="As 2s 3s 4h 6d"
     sh="2d 3h 4h 6s 7d"
     hands=[sf,fk,fh,f,s1,s2,tk,tp,ah,sh]
-    print(pokerSort([h.split() for h in hands]))
     for hand in hands:
         print(hand, hand_rank(hand.split()))
     
@@ -122,7 +118,7 @@ if __name__=='__main__':
     #由高牌到同花順的出現次數
     [501392, 421984, 47823, 21211, 3953, 1994, 1406, 222, 15]
     
-    [TODO] 目前判斷牌型太花時間，需調整
+    [TODO] 目前判斷牌型太花時間，可能可以優化
     """
     List=[0]*9
     tStart = time.time()#計時開始

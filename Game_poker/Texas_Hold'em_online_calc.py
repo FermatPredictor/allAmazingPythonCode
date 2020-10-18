@@ -3,6 +3,7 @@
 用於線上玩Texas_Hold'em，假設對手的牌全是隨機，計算己方勝率
 """
 from collections import Counter
+from collections import defaultdict
 from itertools import groupby
 
 import sys
@@ -11,10 +12,10 @@ from _package._poker.poker_tool import StardardDeck
 
 # 順子(注意A需要看作是1而非14)
 def straight(rank):
-    rank = sorted(set([1 if x==14 else x for x in rank]))
+    rank = sorted(set([1 if x==14 else x for x in rank]), reverse=True)
     for i in range(len(rank)-4):
-        if rank[i+4]-rank[i]==4:
-            return rank[i+4]
+        if rank[i]-rank[i+4]==4:
+            return rank[i]
     return False
     
 #回傳數字陣列恰好出現n次的數字，降序排列
@@ -50,7 +51,7 @@ def hand_rank(hand):
     
     flush = sorted(filter(lambda v: len(v)>=5, suit_gp.values()), reverse=True)
     _straight = straight(rank)
-    straightFlush = sorted(filter(lambda v: len(v)>=5 and straight(v), suit_gp.values()), reverse=True)
+    straightFlush = sorted(filter(lambda v: straight(v), flush), reverse=True)
     
     single, pair, three_kind, four_kind = (n_kind(rank, i) for i in range(1,5))
     
@@ -74,27 +75,39 @@ def hand_rank(hand):
         return (2, pair[0],*single[:3])
     return (1,*single[:5])
 
-#將一堆手牌按照牌型大小排序    
-def pokerSort(hands):
-    return sorted(hands,key=hand_rank,reverse=True)
 
 def sepList(L,step):
     return [L[i:i+step] for i in range(0,len(L),step)]
 
 
-def myCardWin(myCard, field, rivalCardList):
+def arrayRank(arr, key=None):
+    """ 將陣列依key函數映射的大小順序排序 """
+    x_rank = dict((tuple(e), i+1) for i, e in enumerate(sorted(arr, key=key, reverse=True)))
+    return [x_rank[tuple(e)] for e in arr]
+
+def myCardWin(myCard, field, rivalCardList, debug=False):
     """
-    判斷自己的手牌是否獲勝, 範例格式:
+    判斷自己的手牌排序第幾名, 範例格式:
     myCard= ["Kc", "Ac"]
-    field= ["Kd", "Th", "4c", "6h", "As"]
-    rivalCardList= [['Qd', 'Qc'], ['Ah', 4s']]
-    return True
+    field = ["Kd", "Th", "4c", "6h", "As"]
+    rivalCardList= [['Qd', 'Qc'], ['Ah', '4s']]
+    return 1
+    Use myCardWin(["Kc", "Ac"], ["Kd", "Th", "4c", "6h", "As"], [['Qd', 'Qc'], ['Ah', '4s']], debug=True)
+    to test...
     """
     if not field:
         field = []
     myHand = myCard+field
     rivalHands=[r+field for r in rivalCardList]
     Hands=[myHand]+rivalHands
+    
+    ranks = arrayRank(Hands, key = hand_rank)
+    if debug:
+        print(f'myCard is: {myCard}')
+        print(f'fieldCard is: {field}')
+        print(f'rivalCard are: {rivalCardList}')
+        print(f'rank of cards: {ranks}')
+    return ranks[0]
     
     """ 查看哪些牌可以贏過自己 """
     BIG_CARD = max(Hands,key=hand_rank)
@@ -107,9 +120,10 @@ def myCardWin(myCard, field, rivalCardList):
             
     return myHand == BIG_CARD
 
-def winProb(myCard, fieldCard=None, simulate=100, rivalNum=1):  
+
+def winProb(myCard, fieldCard=None, simulate=1000, rivalNum=1):  
     """
-    計算自己的手牌在一對多任意牌的狀況下的勝率
+    計算自己的手牌在一對多任意牌的狀況下的勝率(可計算各個名次的機率)
     """
     deck = StardardDeck()
     if not fieldCard:
@@ -122,15 +136,15 @@ def winProb(myCard, fieldCard=None, simulate=100, rivalNum=1):
     field_card_num = len(fieldCard)
     assert field_card_num<=5, "Too many number of field cards."
     
-    winNum = 0
+    winDict = defaultdict(int)
     for _ in range(simulate):
         # 若公共牌還沒亮至5張，隨機補至5張牌
         # 隨機產生對手的牌
         cards = deck.rand_card(rivalNum*2 + 5-field_card_num)
         rival_card, field_card = sepList(cards[:2*rivalNum],2), cards[2*rivalNum:]
-        if myCardWin(myCard, fieldCard + field_card , rival_card):
-            winNum += 1        
-    return winNum/simulate*100
+        rank = myCardWin(myCard, fieldCard + field_card , rival_card)
+        winDict[rank] += 1
+    return [(k, round(winDict[k]/simulate*100, 2)) for k in sorted(winDict.keys())]
 
 
 
@@ -163,8 +177,7 @@ if __name__=='__main__':
             except:
                 pass
             
-        print(f"Win prob is {winProb(mycard,rivalNum=1):.2f} for 1v1")
-        print(f"Win prob is {winProb(mycard,rivalNum=r):.2f} for 1v{r}")
+        print(f"Win prob is {winProb(mycard,rivalNum=r)} for 1v{r}")
         
         hints = ["What is field?",
                  "What is fourth card?",
@@ -176,6 +189,6 @@ if __name__=='__main__':
                 break
             field_cards.extend(card)
             print(f'field is {field_cards}')
-            print(f"Win prob for {mycard} is {winProb(mycard,fieldCard=field_cards, rivalNum=r):.2f}")
+            print(f"Win prob for {mycard} is {winProb(mycard,fieldCard=field_cards, rivalNum=r)}")
             
     
