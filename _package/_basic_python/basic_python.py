@@ -51,6 +51,29 @@ def backSepList(L,step):
     """
     return [L[max(0,i-step+1):i+1] for i in range(len(L)-1,-1,-step)][::-1]
 
+
+def rotateRight(s, offset):
+    """
+    函數功能: 把一個字串(or陣列)向右旋轉offset個長度
+    例: abcdefg, offset = 3+7k => efgabcd
+    >>> rotateRight("",3)
+    ''
+    >>> rotateRight("abcdefg",3)
+    'efgabcd'
+    """
+    return s[-offset%len(s):]+s[:-offset%len(s)] if s else s
+
+
+def rotateLeft(s, offset):
+    """
+    函數功能: 把一個字串(or陣列)向左旋轉offset個長度
+    >>> rotateLeft("abcdefg",3) 
+    'defgabc'
+    >>> rotateLeft([1,2,3,4],1)
+    [2, 3, 4, 1]
+    """
+    return s[offset%len(s):]+s[:offset%len(s)] if s else s
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
