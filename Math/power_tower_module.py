@@ -1,5 +1,8 @@
 import math
-from _basic_math import euler_phi
+
+import sys
+sys.path.append('..') # 添加相對路徑上層到sys.path，讓程式找到的模組_package
+from _package._math_tool._basic_math import euler_phi
 
 
 def towerLargerThan(base, h, m):
