@@ -2,6 +2,8 @@ from datetime import datetime
 import time
 import random
 
+def rand_str(length):
+    return ''.join([chr(ord('a')+random.randrange(26)) for _ in range(length)])
 
 def rand_re(regex):
     """

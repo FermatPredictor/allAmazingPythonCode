@@ -13,6 +13,9 @@ def read_csv(file_name):
             pass
     raise RuntimeError('We try all encoding but cannot read the csv')
     
+def ini_df(data_dict):
+    return pd.DataFrame.from_dict(data_dict)
+    
 def rand_df(rand_dict, row_num, miss_rate=0, na_values = None):
     """
     函數功能: 依指定規則生成一個隨機dataframe
