@@ -20,6 +20,13 @@ def read_csv(file_name):
     raise RuntimeError('We try all encoding but cannot read the csv')
     
 def ini_df(data_dict):
+    """
+    caller example:
+    scores = {"姓名":["小華","小明","小李"],
+             "國文":[80,55,75],
+             "數學":[90,70,45]}
+    df = ini_df(scores)
+    """
     return pd.DataFrame.from_dict(data_dict)
     
 def rand_df(rand_dict, row_num, miss_rate=0, na_values = None):
@@ -96,31 +103,6 @@ def df_groupby_list(df, col, inplace = False, remove_dup = True):
         df[other_cols] = df[other_cols].applymap(lambda x:list(set(x)))
     return df
 
-def df_range_filter(df, *args):
-    """
-    函數功能: 
-    將dataframe依指定條件過濾
-    參數:
-        *args 是長度為3的tuple，格式如:
-        ('欄位名', 比較運算符, value or string)
-       
-    caller example:
-    >>> df = pd.DataFrame({'Animal': ['Falcon', 'Falcon', 'Parrot', 'Parrot'],
-                           'Max Speed': [380., 370., 24., 26.],
-                           'Value':[3,3,2,6]})
-    >>> print(df_range_filter(df, ('Max Speed', '>', 375)))
-    
-       Animal  Max Speed  Value
-    2  Parrot       24.0      2
-    """
-    df = df.copy() #不修改原殆df
-    for arg in args:
-        assert len(arg)==3 and arg[1] in ['==','<=','>=','<','>','!='], 'wrong format of conditions.'
-        val = "'"+arg[2]+"'" if type(arg[2])==str else arg[2]
-        exec(f"m = df['{arg[0]}']{arg[1]}{val}")
-        mask = locals()['m'] # 將exec裡的區域變數取出
-        df = df[mask]
-    return df
 
 def time_diff(series_1, series_2):
     """
@@ -145,7 +127,11 @@ if __name__=='__main__':
                                   'Value':[3,3,2,6]})
     print(df_groupby_list(df, 'Animal'))
     print(df_groupby(df, 'Animal'))
-    print(df_range_filter(df, ('Value', '==', 2)))
+    
+    scores = {"姓名":["小華","小明","小李"],
+             "國文":[80,55,75],
+             "數學":[90,70,45]}
+    score_df = ini_df(scores)
     
     
     min_time = (2020,10,23,0,0,0)
