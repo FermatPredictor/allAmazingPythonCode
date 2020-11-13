@@ -12,7 +12,7 @@ class MinimaxABAgent:
     * state
     * game
        - def getValidMoves(self, state): 回傳一個字典，key值是行動，value是抵達的state
-       - def evaluation_function(self, state, player_color): 回傳此盤面對「 player_color」來說的分數，盤面愈好分數愈高
+       - def evaluation_function(self, state, player_color): 回傳此盤面對「player_color」來說的分數，盤面愈好分數愈高
        - def is_terminal(self, state): 判斷一場遊戲是否已經結束
     """
     
