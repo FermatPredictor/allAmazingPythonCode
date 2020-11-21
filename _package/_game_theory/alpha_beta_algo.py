@@ -41,16 +41,18 @@ class MinimaxABAgent:
         list_action = self.game.getValidMoves(state)
         eval_score, selected_key_action = self._minimax(0,state,True,float('-inf'),float('inf'))
         print(f"MINIMAX : Done, eval = {eval_score}, expanded {self.node_expanded}")
-        print("--- %s seconds ---" % (time.time() - start_time))
+        eval_time = time.time() - start_time
+        print(f"--- {eval_time} seconds ---, avg: {self.node_expanded/eval_time} (explode_node per seconds)")
         return (selected_key_action,list_action[selected_key_action])
  
     def _minimax(self, current_depth, state, is_max_turn, alpha, beta):
+        
+        self.node_expanded += 1
  
         if current_depth == self.max_depth or self.game.is_terminal(state):
             return self.game.evaluation_function(state, self.player_color), ""
  
-        self.node_expanded += 1
- 
+        
         possible_action = self.game.getValidMoves(state)
         key_of_actions = list(possible_action.keys())
  

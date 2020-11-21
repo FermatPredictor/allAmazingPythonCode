@@ -110,7 +110,7 @@ if __name__=='__main__':
     感覺計算上太慢，仍有許多改進空間
     """
     game = Reversi(8,8)
-    AI = MinimaxABAgent(4, 'X', game)
+    AI = MinimaxABAgent(6, 'X', game)
     board = [[' ',' ',' ', ' ', ' ', ' ', ' ', ' '],
              [' ',' ',' ', ' ', ' ', ' ', ' ', ' '],
              [' ',' ',' ', 'X', ' ', ' ', ' ', ' '],
