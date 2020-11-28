@@ -1,29 +1,27 @@
 import os
 from pytube import YouTube
-import requests
-import re
+from pytube import Playlist
 import time
 
 """
-Notice:
-本程式可能過一段時間就會失效，
-需查看是否有最新版本更新
-(2020/10/25: https://pypi.org/project/pytube4/)
-
-目前的版本可能需要嘗試多次才能download 成功
+當前版本: https://pypi.org/project/pytube/
+pytube 10.0.0
 """
 
 def download_play_list(url, path = None):
     """
     函數功能: 
-    下載youtbute的playlist (參考用，目前本函數似乎不太好用)
+    下載youtbute的playlist
     path: 下載影片路徑，未指定則載至當前資料夾
     """
-    html = requests.get(url)
-    res = re.findall(r'/watch[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]', html.text)  #取得包含「/watch」的網址內容
-    video_list = list(map(lambda x: 'https://www.youtube.com' + x, \
-                      set(filter(lambda x: 'list=' in x and 'index=' in x, res))))
-    download_list(video_list, path)
+    pl = Playlist("https://www.youtube.com/watch?v=aVe3sFzX7A8&list=PLTcX3hjX6wGOVmvDfXej3tBtobUFqpIAY")
+    for i, yt in enumerate(pl.videos):
+        try:
+            print(f"{i}. {yt.title}")  #顯示標題
+            yt.streams.get_highest_resolution().download(path)
+        except Exception as e:
+            print(e)
+            print(f'第{i}個影片下載失敗')
 
 
 def download_list(url_list, path = None):
@@ -43,7 +41,7 @@ def download_list(url_list, path = None):
         except Exception as e:
             print(e)
             print(f'第{i}個影片下載失敗')
-        time.sleep(3) # 避免連續發太多request給線上
+        time.sleep(2) # 避免連續發太多request給線上
 
 
 def download_by_txt(file, path = None):
@@ -60,5 +58,9 @@ def download_by_txt(file, path = None):
         
 if __name__ == "__main__":
     path = r'.\music'
-    download_by_txt('video.txt', path = path)
+    play_list_url = '' # enter yout url
+    #download_by_txt('video.txt', path = path)
+    download_play_list(play_list_url , path = path)
+
+            
     
