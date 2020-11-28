@@ -14,7 +14,7 @@ def download_play_list(url, path = None):
     下載youtbute的playlist
     path: 下載影片路徑，未指定則載至當前資料夾
     """
-    pl = Playlist("https://www.youtube.com/watch?v=aVe3sFzX7A8&list=PLTcX3hjX6wGOVmvDfXej3tBtobUFqpIAY")
+    pl = Playlist(url)
     for i, yt in enumerate(pl.videos):
         try:
             print(f"{i}. {yt.title}")  #顯示標題
