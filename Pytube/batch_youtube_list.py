@@ -14,6 +14,9 @@ def download_play_list(url, path = None):
     下載youtbute的playlist
     path: 下載影片路徑，未指定則載至當前資料夾
     """
+    path = path or '.\\'
+    if not os.path.isdir(path):  #防呆: 如果資料夾不存在就建立
+        os.mkdir(path)
     pl = Playlist(url)
     for i, yt in enumerate(pl.videos):
         try:
